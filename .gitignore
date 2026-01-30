@@ -15,3 +15,5 @@ frontend/.env
 # OS / Editor
 .DS_Store
 .vscode/
+git remote add origin https://github.com/Namankumar608x/portfolio.git
+git push -u origin main
