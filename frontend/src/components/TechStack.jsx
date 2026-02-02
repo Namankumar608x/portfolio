@@ -10,7 +10,7 @@ const TechStack = () => {
   useEffect(() => {
     const fetchTechStack = async () => {
       try {
-        const res = await fetch(`${API_BASE}/tech-stack/`);
+        const res = await fetch(`${API_BASE}/api/tech-stack/`);
         const data = await res.json();
         setTechStack(data);
       } catch (err) {

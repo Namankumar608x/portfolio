@@ -4,13 +4,15 @@ const API_BASE = import.meta.env.VITE_API_BASE;
 
 
 const Projects = () => {
+    console.log("API_BASE =", API_BASE);
+
   const [projects, setProjects] = useState([]);
   const [hoveredCard, setHoveredCard] = useState(null);
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const res = await fetch(`${API_BASE}/projects/`);
+        const res = await fetch(`${API_BASE}/api/projects/`);
         const data = await res.json();
         setProjects(data);
       } catch (err) {

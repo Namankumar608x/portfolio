@@ -3,6 +3,9 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
 
+
+from django.core.mail import EmailMessage
+
 from .models import Project, TechStack, ContactMessage
 
 
@@ -37,40 +40,46 @@ def tech_stack_list(request):
 # -------------------------
 # Contact API (POST)
 # -------------------------
-@csrf_exempt
+
+
+
+
 @csrf_exempt
 def contact_api(request):
-    print("CONTACT API HIT")  # 👈 sanity check
-
+    # Handle preflight OPTIONS request
+    if request.method == "OPTIONS":
+        response = JsonResponse({"status": "ok"})
+        response["Access-Control-Allow-Origin"] = "*"
+        response["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+        response["Access-Control-Allow-Headers"] = "Content-Type"
+        return response
+    
     if request.method != "POST":
         return JsonResponse({"error": "Invalid method"}, status=405)
 
     try:
-        import json
-        from django.core.mail import EmailMessage
-
         data = json.loads(request.body)
-        print("DATA:", data)
-
+        
         name = data.get("name")
         email = data.get("email")
         message = data.get("message")
 
-        print("FIELDS:", name, email, message)
-
         if not name or not email or not message:
             return JsonResponse({"error": "Missing fields"}, status=400)
 
-        # COMMENT DB SAVE FOR NOW (to isolate issue)
-        # ContactMessage.objects.create(
-        #     name=name,
-        #     email=email,
-        #     message=message
-        # )
+        # Save to database
+        ContactMessage.objects.create(
+            name=name,
+            email=email,
+            message=message
+        )
 
+        # Send email notification
         mail = EmailMessage(
             subject=f"Portfolio Contact from {name}",
             body=f"""
+New contact form submission:
+
 Name: {name}
 Email: {email}
 
@@ -82,14 +91,9 @@ Message:
             reply_to=[email],
         )
 
-        print("SENDING MAIL...")
         mail.send()
-        print("MAIL SENT")
 
         return JsonResponse({"success": "Message sent"}, status=200)
 
     except Exception as e:
-        print("🔥 CONTACT API ERROR 🔥")
-        print(type(e))
-        print(e)
         return JsonResponse({"error": str(e)}, status=500)
