@@ -20,7 +20,6 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "unsafe-dev-key")
 
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-# ⚠️ ALLOWED_HOSTS "*" is OK, but not enough alone
 ALLOWED_HOSTS = [
     "portfolio-z28o.onrender.com",
     "localhost",
@@ -45,15 +44,13 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",          # Must be first
 
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
 
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-
-    # ⚠️ CSRF middleware must stay enabled
     "django.middleware.csrf.CsrfViewMiddleware",
 
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -127,7 +124,7 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
 # =========================
-# 🔐 CSRF + PROXY (THIS FIXES ADMIN LOGIN 500)
+# CSRF + PROXY
 # =========================
 
 CSRF_TRUSTED_ORIGINS = [
@@ -143,17 +140,45 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 CORS_ALLOW_ALL_ORIGINS = True
 
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
 
 # =========================
 # EMAIL CONFIG
 # =========================
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+
+# If env vars are missing, print to console instead of crashing
+if not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD:
+    print("⚠️  WARNING: EMAIL_HOST_USER or EMAIL_HOST_PASSWORD is missing.")
+    print("⚠️  Emails will be printed to console only.")
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = "smtp.gmail.com"
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
 
 
 # =========================
