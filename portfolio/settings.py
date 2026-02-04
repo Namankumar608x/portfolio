@@ -39,13 +39,12 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    "corsheaders",
     "base",
 ]
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",          # Must be first
-
+    "portfolio.cors_middleware.CorsMiddleware",       # Custom CORS - MUST be first
+    
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
 
@@ -132,45 +131,6 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-
-
-# =========================
-# CORS
-# =========================
-
-# Allow all origins (for development/testing)
-CORS_ALLOW_ALL_ORIGINS = True
-
-# Alternative: specify allowed origins explicitly
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:5173",
-#     "http://localhost:3000",
-#     "https://your-frontend-domain.com",
-# ]
-
-CORS_ALLOW_METHODS = [
-    "DELETE",
-    "GET",
-    "OPTIONS",
-    "PATCH",
-    "POST",
-    "PUT",
-]
-
-CORS_ALLOW_HEADERS = [
-    "accept",
-    "accept-encoding",
-    "authorization",
-    "content-type",
-    "dnt",
-    "origin",
-    "user-agent",
-    "x-csrftoken",
-    "x-requested-with",
-]
-
-# Important: Allow credentials if needed
-CORS_ALLOW_CREDENTIALS = False
 
 
 # =========================
