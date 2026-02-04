@@ -90,17 +90,23 @@ def contact_api(request):
         email_error = None
         try:
             from django.core.mail import EmailMessage
-            mail = EmailMessage(
-                subject=f"Portfolio Contact from {name}",
-                body=f"FROM: {name}\nEMAIL: {email}\n\nMESSAGE:\n{message}",
-                from_email="namanm608@gmail.com",
-                to=["namanm608@gmail.com"],
-                reply_to=[email],
-            )
-            mail.send(fail_silently=False)
-            email_sent = True
+            from django.conf import settings
+            
+            # Only try to send if email is configured
+            if hasattr(settings, 'EMAIL_HOST_USER') and settings.EMAIL_HOST_USER:
+                mail = EmailMessage(
+                    subject=f"Portfolio Contact from {name}",
+                    body=f"FROM: {name}\nEMAIL: {email}\n\nMESSAGE:\n{message}",
+                    from_email="namanm608@gmail.com",
+                    to=["namanm608@gmail.com"],
+                    reply_to=[email],
+                )
+                # Use fail_silently=True to prevent crashes
+                mail.send(fail_silently=True)
+                email_sent = True
         except Exception as e:
             email_error = str(e)
+            # Don't crash - just log the error
 
         # Return response
         if db_saved or email_sent:
