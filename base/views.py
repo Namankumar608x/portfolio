@@ -48,30 +48,11 @@ def contact_api(request):
     print(f"🔵 Origin: {request.META.get('HTTP_ORIGIN', 'No origin')}")
     print(f"🔵 Content-Type: {request.META.get('CONTENT_TYPE', 'No content type')}")
     print("=" * 60)
-    
-    # Helper function to add CORS headers to ALL responses
-    def add_cors_headers(response):
-        """Add CORS headers to allow cross-origin requests"""
-        response["Access-Control-Allow-Origin"] = "*"
-        response["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
-        response["Access-Control-Allow-Headers"] = "Content-Type, Accept, Origin"
-        response["Access-Control-Max-Age"] = "86400"  # 24 hours
-        print("✅ CORS headers added to response")
-        return response
-
-    # Handle preflight OPTIONS request
-    if request.method == "OPTIONS":
-        print("🔵 OPTIONS preflight request detected")
-        response = JsonResponse({"status": "ok"})
-        response = add_cors_headers(response)
-        print("✅ OPTIONS response sent with CORS headers")
-        return response
 
     # Only allow POST for actual contact submission
     if request.method != "POST":
         print(f"❌ Invalid method: {request.method}")
-        response = JsonResponse({"error": "Only POST method allowed"}, status=405)
-        return add_cors_headers(response)
+        return JsonResponse({"error": "Only POST method allowed"}, status=405)
 
     # Process POST request
     try:
@@ -219,7 +200,6 @@ Sent via Portfolio Contact Form
             }, status=500)
             print("❌ 500 Error response created")
 
-        response = add_cors_headers(response)
         print("=" * 60)
         print("🏁 CONTACT API COMPLETE")
         print("=" * 60)
@@ -234,9 +214,8 @@ Sent via Portfolio Contact Form
         traceback.print_exc()
         print("=" * 60)
         
-        response = JsonResponse({
+        return JsonResponse({
             "error": "Internal server error",
             "message": str(e),
             "type": type(e).__name__
         }, status=500)
-        return add_cors_headers(response)
