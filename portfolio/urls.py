@@ -5,7 +5,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/", include("base.urls")),
+    # Ensure this exactly matches how your frontend calls it
+    path("api/", include("base.urls")), 
 ]
 
 if settings.DEBUG:
